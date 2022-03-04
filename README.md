@@ -1,2 +1,2 @@
 # agenda-postgresql
-Aplicação REST usando: Spring, PostgreSQL, Java
+REST application using: Spring, PostgreSQL and Java
