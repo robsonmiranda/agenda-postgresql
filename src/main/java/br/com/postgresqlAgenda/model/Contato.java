@@ -1,5 +1,6 @@
 package br.com.postgresqlAgenda.model;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 import javax.persistence.Column;
@@ -20,7 +21,7 @@ import lombok.Setter;
 @Table(name = "contato")
 @AllArgsConstructor
 @NoArgsConstructor
-public class Contato {
+public class Contato implements Serializable {
 
     private static final long serialVersionUID = 7916533899715748375L;
 
@@ -28,9 +29,9 @@ public class Contato {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @Column(name = "name", nullable = false, unique = true, length = 70)
-    private String nome;
+    private String name;
     @Column(name = "phone", nullable = false, length = 15)
-    private String fone;
+    private String phone;
     @Column(name = "birth_dt", nullable = false)
     private LocalDate birthDate;
 }

@@ -18,6 +18,7 @@ import br.com.postgresqlAgenda.exception.ResourceNotFoundException;
 import br.com.postgresqlAgenda.model.Contato;
 import br.com.postgresqlAgenda.repository.ContatoRepository;
 
+@SuppressWarnings("unused")
 @RestController
 @RequestMapping("/contatos")
 public class ContatoController {
@@ -45,10 +46,9 @@ public class ContatoController {
     public Contato updateContato(@PathVariable("id") Long id, @RequestBody Contato contatoDetails) throws ResourceNotFoundException {
         Contato contato = contatoRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Contato não encontrado para este id :: " + id));
-        contato.setNome(contatoDetails.getNome());
-        contato.setFone(contatoDetails.getFone());
-        final Contato updatedContato = contatoRepository.save(contato);
-        return updatedContato;
+        contato.setName(contatoDetails.getName());
+        contato.setPhone(contatoDetails.getPhone());
+        return contatoRepository.save(contato);
     }
 
     @DeleteMapping("/{id}")
@@ -56,7 +56,7 @@ public class ContatoController {
         Contato contato = contatoRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Contato não encontrado para este id :: " + id));
         contatoRepository.delete(contato);
-        Map<String, Boolean> response = new HashMap<String, Boolean>();
+        Map<String, Boolean> response = new HashMap<>();
         response.put("deleted", Boolean.TRUE);
         return response;
     }
