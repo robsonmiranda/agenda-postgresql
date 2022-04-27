@@ -1,63 +1,70 @@
 package br.com.postgresqlAgenda.controller;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import br.com.postgresqlAgenda.exception.ResourceNotFoundException;
+import br.com.postgresqlAgenda.dto.ContatoDto;
 import br.com.postgresqlAgenda.model.Contato;
-import br.com.postgresqlAgenda.repository.ContatoRepository;
+import br.com.postgresqlAgenda.service.ContatoService;
+import org.springframework.beans.BeanUtils;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-@SuppressWarnings("unused")
+import javax.validation.Valid;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 @RestController
-@RequestMapping("/contatos")
+@CrossOrigin(origins = "*", maxAge = 3600)
+@RequestMapping("/contato")
 public class ContatoController {
-    
-    @Autowired
-    private ContatoRepository contatoRepository;
+
+    final ContatoService contatoService;
+
+    public ContatoController(ContatoService contatoService) {
+        this.contatoService = contatoService;
+    }
+
+    @PostMapping
+    public ResponseEntity<Object> saveContato(@RequestBody @Valid ContatoDto contatoDto) {
+        if (contatoService.existByName(contatoDto.getName())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Conflict: This name is already in use!");
+        }
+        Contato contato = new Contato();
+        BeanUtils.copyProperties(contatoDto, contato);
+        return ResponseEntity.status(HttpStatus.CREATED).body(contatoService.save(contato));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Contato>> getAllContatos() {
+        return ResponseEntity.status(HttpStatus.OK).body(contatoService.findAll());
+    }
 
     @GetMapping("/{id}")
-    public Contato getContatoById(@PathVariable("id") Long id) throws ResourceNotFoundException {
-        if (id != null) {
-           Optional<Contato> contato = this.contatoRepository.findById(id);
-           if (contato.isPresent()) {
-               return contato.get();
-           }
-        }
-        return null;
-    }
-
-    @PostMapping("/")
-    public Contato createContato(@RequestBody Contato contato) {
-        return this.contatoRepository.save(contato);
-    }
-
-    @PutMapping("/{id}")
-    public Contato updateContato(@PathVariable("id") Long id, @RequestBody Contato contatoDetails) throws ResourceNotFoundException {
-        Contato contato = contatoRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Contato não encontrado para este id :: " + id));
-        contato.setName(contatoDetails.getName());
-        contato.setPhone(contatoDetails.getPhone());
-        return contatoRepository.save(contato);
+    public ResponseEntity<Object> getOneContato(@PathVariable(value = "id") UUID id) {
+        Optional<Contato> contatoOptional = contatoService.findById(id);
+        return contatoOptional.<ResponseEntity<Object>>
+                map(contato -> ResponseEntity.status(HttpStatus.OK).body(contato))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Contato not found!"));
     }
 
     @DeleteMapping("/{id}")
-    public Map<String, Boolean> deleteContato(@PathVariable("id") Long id) throws ResourceNotFoundException {
-        Contato contato = contatoRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Contato não encontrado para este id :: " + id));
-        contatoRepository.delete(contato);
-        Map<String, Boolean> response = new HashMap<>();
-        response.put("deleted", Boolean.TRUE);
-        return response;
+    public ResponseEntity<String> deleteContato(@PathVariable(value = "id") UUID id) {
+        Optional<Contato> optionalContato = contatoService.findById(id);
+        if (optionalContato.isPresent()) {
+            contatoService.delete(optionalContato.get());
+            return ResponseEntity.status(HttpStatus.OK).body("Contato deleted successfully!");
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Contato not found!");
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Object> updateContato(@PathVariable(value = "id") UUID id, @RequestBody @Valid ContatoDto contatoDto) {
+        Optional<Contato> optionalContato = contatoService.findById(id);
+        if (optionalContato.isPresent()) {
+            Contato contato = optionalContato.get();
+            contato.setPhone(contatoDto.getPhone());
+            return ResponseEntity.status(HttpStatus.OK).body(contatoService.save(contato));
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Contato not found!");
     }
 }

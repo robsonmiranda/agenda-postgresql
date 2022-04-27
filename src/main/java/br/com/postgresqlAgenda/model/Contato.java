@@ -1,37 +1,44 @@
 package br.com.postgresqlAgenda.model;
 
+import javax.persistence.*;
 import java.io.Serializable;
-import java.time.LocalDate;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.util.UUID;
 
 @Entity
-@Getter
-@Setter
 @Table(name = "contato")
-@AllArgsConstructor
-@NoArgsConstructor
 public class Contato implements Serializable {
 
-    private static final long serialVersionUID = 7916533899715748375L;
+    private static final long serialVersionUID = -6979566904278831179L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-    @Column(name = "name", nullable = false, unique = true, length = 70)
+    private UUID id;
     private String name;
-    @Column(name = "phone", nullable = false, length = 15)
     private String phone;
-    @Column(name = "birth_dt", nullable = false)
-    private LocalDate birthDate;
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    @Column(name = "name", nullable = false, unique = true, length = 70)
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Column(name = "phone", nullable = false, length = 15)
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
 }
