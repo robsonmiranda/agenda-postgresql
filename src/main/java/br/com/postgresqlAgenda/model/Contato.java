@@ -2,6 +2,7 @@ package br.com.postgresqlAgenda.model;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
@@ -15,6 +16,7 @@ public class Contato implements Serializable {
     private UUID id;
     private String name;
     private String phone;
+    private LocalDate birthDate;
 
     public UUID getId() {
         return id;
@@ -40,5 +42,14 @@ public class Contato implements Serializable {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    @Column(name = "birth_dt", nullable = false)
+    public LocalDate getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
     }
 }

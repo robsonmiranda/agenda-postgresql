@@ -40,11 +40,28 @@ public class ContatoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getOneContato(@PathVariable(value = "id") UUID id) {
-        Optional<Contato> contatoOptional = contatoService.findById(id);
-        return contatoOptional.<ResponseEntity<Object>>
+    public ResponseEntity<Object> getContatoById(@PathVariable(value = "id") UUID id) {
+        Optional<Contato> optionalContato = contatoService.findById(id);
+        return optionalContato.<ResponseEntity<Object>>
                 map(contato -> ResponseEntity.status(HttpStatus.OK).body(contato))
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Contato not found!"));
+    }
+
+    @GetMapping("/name={name}")
+    public ResponseEntity<Object> getContatoByName(@PathVariable(value = "name") String name) {
+        Optional<Contato> optionalContato = contatoService.findByName(name);
+        return optionalContato.<ResponseEntity<Object>>
+                map(contato -> ResponseEntity.status(HttpStatus.OK).body(contato))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Contato not found!"));
+    }
+
+    @GetMapping("/phone={phone}")
+    public ResponseEntity<Object> getContatoByPhone(@PathVariable(value = "phone") String phone) {
+        List<Contato> contatoList = contatoService.findByPhone(phone);
+        if (contatoList.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Contato not found!");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(contatoList);
     }
 
     @DeleteMapping("/{id}")
@@ -61,8 +78,10 @@ public class ContatoController {
     public ResponseEntity<Object> updateContato(@PathVariable(value = "id") UUID id, @RequestBody @Valid ContatoDto contatoDto) {
         Optional<Contato> optionalContato = contatoService.findById(id);
         if (optionalContato.isPresent()) {
-            Contato contato = optionalContato.get();
-            contato.setPhone(contatoDto.getPhone());
+            Contato contato = new Contato();
+            BeanUtils.copyProperties(contatoDto, contato);
+            contato.setId(optionalContato.get().getId());
+            contato.setName(optionalContato.get().getName());
             return ResponseEntity.status(HttpStatus.OK).body(contatoService.save(contato));
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Contato not found!");

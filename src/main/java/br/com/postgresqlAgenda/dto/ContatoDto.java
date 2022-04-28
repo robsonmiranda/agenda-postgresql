@@ -1,12 +1,15 @@
 package br.com.postgresqlAgenda.dto;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.LocalDate;
 
 public class ContatoDto {
 
     private String name;
     private String phone;
+    private LocalDate birthDate;
 
     @NotBlank
     @Size(max = 70)
@@ -26,5 +29,14 @@ public class ContatoDto {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    @NotNull
+    public LocalDate getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
     }
 }
