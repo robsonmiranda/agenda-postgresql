@@ -4,6 +4,10 @@ import br.com.postgresqlAgenda.dto.ContatoDto;
 import br.com.postgresqlAgenda.model.Contato;
 import br.com.postgresqlAgenda.service.ContatoService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,8 +39,9 @@ public class ContatoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Contato>> getAllContatos() {
-        return ResponseEntity.status(HttpStatus.OK).body(contatoService.findAll());
+    public ResponseEntity<Page<Contato>> getAllContatos(@PageableDefault(page = 0, size = 10, sort = "birthDate",
+            direction = Sort.Direction.ASC) Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK).body(contatoService.findAll(pageable));
     }
 
     @GetMapping("/{id}")

@@ -3,6 +3,8 @@ package br.com.postgresqlAgenda.service;
 import br.com.postgresqlAgenda.model.Contato;
 import br.com.postgresqlAgenda.repository.ContatoRepository;
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -24,8 +26,8 @@ public class ContatoService {
         return contatoRepository.save(contato);
     }
 
-    public List<Contato> findAll() {
-        return contatoRepository.findAll();
+    public Page<Contato> findAll(Pageable pageable) {
+        return contatoRepository.findAll(pageable);
     }
 
     public Optional<Contato> findById(UUID id) {
